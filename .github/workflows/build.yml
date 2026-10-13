@@ -5,6 +5,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -41,6 +44,24 @@ jobs:
         with:
           name: TimeCue-windows
           path: dist/TimeCue.exe
+
+      - name: Скриншоты окон в ветку screenshots (для проверки)
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tmp = Join-Path $env:RUNNER_TEMP "shots"
+          New-Item -ItemType Directory -Force $tmp | Out-Null
+          Copy-Item selftest_out\*.png $tmp -ErrorAction SilentlyContinue
+          Set-Location $tmp
+          git init -q
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q -b screenshots
+          git add -A
+          git commit -q -m "screenshots $env:GITHUB_SHA"
+          git push -q -f "https://x-access-token:$env:GH_TOKEN@github.com/$env:GITHUB_REPOSITORY" screenshots
 
       - uses: actions/upload-artifact@v4
         if: always()
