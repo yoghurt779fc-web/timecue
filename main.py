@@ -24,11 +24,11 @@ def selftest(out_dir: str) -> int:
     from timecue.show import Cue, DmxRow, Show
     from timecue.ui.main_window import MainWindow
     from timecue.ui.settings_dialog import SettingsDialog
-    from timecue.ui.style import QSS
+    from timecue.ui.style import build_qss
 
     os.makedirs(out_dir, exist_ok=True)
     app = QApplication.instance() or QApplication(sys.argv)
-    app.setStyleSheet(QSS)
+    app.setStyleSheet(build_qss())
     show = Show()
     show.cues = [
         Cue(type="audio", number="1", name="Интро", file="intro.wav", trigger="00:00:00:00"),
@@ -99,7 +99,7 @@ def main() -> int:
     from timecue import APP_NAME
     from timecue.show import Show
     from timecue.ui.main_window import MainWindow
-    from timecue.ui.style import QSS
+    from timecue.ui.style import build_qss
 
     if sys.platform.startswith("win"):
         try:  # своя иконка в панели задач Windows
@@ -110,7 +110,7 @@ def main() -> int:
 
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
-    app.setStyleSheet(QSS)
+    app.setStyleSheet(build_qss())
     icon = _resource("icon.ico")
     if os.path.exists(icon):
         app.setWindowIcon(QIcon(icon))

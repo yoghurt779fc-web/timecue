@@ -189,6 +189,7 @@ class Inspector(QFrame):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidget(self.body)
         scroll.setStyleSheet("QScrollArea { background: transparent; } QScrollArea > QWidget > QWidget { background: transparent; }")
         outer.addWidget(scroll, 1)
@@ -244,7 +245,7 @@ class Inspector(QFrame):
         lay = QVBoxLayout(w)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(8)
-        self.d_clear = QCheckBox("Сначала обнулить все каналы (blackout), потом выставить значения")
+        self.d_clear = QCheckBox("Сначала обнулить все каналы (blackout)")
         lay.addWidget(self.d_clear)
         hdr = QHBoxLayout()
         for text, stretch in (("Вселенная", 0), ("Каналы", 0), ("Значение 0–255", 1)):

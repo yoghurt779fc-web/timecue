@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
         vsplit.addWidget(self._build_log())
         vsplit.setStretchFactor(0, 5)
         vsplit.setStretchFactor(1, 1)
-        vsplit.setSizes([600, 120])
+        vsplit.setSizes([680, 90])
         v.addWidget(vsplit, 1)
 
         self._build_menu()

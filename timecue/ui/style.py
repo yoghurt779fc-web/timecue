@@ -133,9 +133,22 @@ QGroupBox {{
 }}
 QGroupBox::title {{ subcontrol-origin: margin; left: 10px; padding: 0 4px; color: {MUTED}; }}
 QSplitter::handle {{ background: transparent; }}
-QScrollBar:vertical {{ background: transparent; width: 10px; margin: 0; }}
+QScrollBar:vertical {{ background: transparent; width: 10px; margin: 0; border: none; }}
+QScrollBar:horizontal {{ background: transparent; height: 10px; margin: 0; border: none; }}
 QScrollBar::handle:vertical {{ background: {BORDER}; border-radius: 5px; min-height: 30px; }}
-QScrollBar::add-line, QScrollBar::sub-line {{ height: 0; }}
+QScrollBar::handle:horizontal {{ background: {BORDER}; border-radius: 5px; min-width: 30px; }}
+QScrollBar::handle:hover {{ background: #45506a; }}
+QScrollBar::add-line, QScrollBar::sub-line {{ width: 0; height: 0; border: none; background: none; }}
+QScrollBar::add-page, QScrollBar::sub-page {{ background: none; }}
+QAbstractScrollArea::corner {{ background: transparent; border: none; }}
+QCheckBox::indicator {{
+    width: 16px; height: 16px;
+    border: 1px solid #5b6475;
+    border-radius: 4px;
+    background: {BG};
+}}
+QCheckBox::indicator:hover {{ border-color: {BLUE}; }}
+QCheckBox::indicator:checked {{ background: {BLUE}; border-color: {BLUE}; image: url(%CHECK%); }}
 QSlider::groove:horizontal {{ height: 6px; background: {BORDER}; border-radius: 3px; }}
 QSlider::handle:horizontal {{ background: {AMBER}; width: 14px; margin: -5px 0; border-radius: 7px; }}
 QSlider::sub-page:horizontal {{ background: {AMBER}; border-radius: 3px; }}
@@ -146,6 +159,27 @@ QMenu::item:selected {{ background: {BLUE}; }}
 QStatusBar {{ color: {MUTED}; }}
 QToolTip {{ background: {PANEL_2}; color: {TEXT}; border: 1px solid {BORDER}; padding: 6px; }}
 """
+
+
+_CHECK_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">'
+    '<path d="M3.5 8.5l3 3 6-7" fill="none" stroke="white" stroke-width="2.2" '
+    'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+)
+
+
+def build_qss() -> str:
+    """Готовая таблица стилей. Галочку для чекбоксов кладём во временный файл —
+    Qt-стили умеют брать картинки только из файлов."""
+    import os
+    import tempfile
+    path = os.path.join(tempfile.gettempdir(), "timecue_check.svg")
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(_CHECK_SVG)
+    except OSError:
+        return QSS.replace("image: url(%CHECK%);", "")
+    return QSS.replace("%CHECK%", path.replace("\\", "/"))
 
 
 def lamp_style(color: str | None) -> str:
