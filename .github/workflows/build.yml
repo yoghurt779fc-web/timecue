@@ -1,0 +1,51 @@
+name: Сборка TimeCue для Windows
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Тесты ядра (LTC, MTC, DMX, OSC, движок)
+        run: python tests/test_core.py
+
+      - name: Самопроверка интерфейса
+        run: python main.py --selftest selftest_out
+
+      - name: Сборка exe
+        run: >
+          pyinstaller --noconfirm --clean --onefile --windowed --name TimeCue --icon icon.ico
+          --add-data "icon.ico;." --hidden-import mido.backends.rtmidi --hidden-import rtmidi main.py
+
+      - name: Проверка, что exe запускается
+        run: |
+          $p = Start-Process -FilePath dist\TimeCue.exe -ArgumentList "--selftest","exe_selftest" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "exe selftest failed: $($p.ExitCode)" }
+        shell: pwsh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TimeCue-windows
+          path: dist/TimeCue.exe
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: |
+            selftest_out/*.png
+            exe_selftest/*.png
